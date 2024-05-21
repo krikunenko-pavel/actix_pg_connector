@@ -5,7 +5,6 @@ use deadpool_postgres::tokio_postgres::{NoTls, Row};
 use deadpool_postgres::tokio_postgres::types::ToSql;
 use url::Url;
 
-use crate::messages;
 use crate::messages::SelectOneMessage;
 
 pub struct PgConnector(Pool);
@@ -33,10 +32,10 @@ impl Actor for PgConnector {
     type Context = Context<Self>;
 }
 
-impl Handler<messages::SelectOneMessage> for PgConnector {
+impl Handler<Box<SelectOneMessage>> for PgConnector {
     type Result = ResponseFuture<Result<Row, deadpool_postgres::tokio_postgres::Error>>;
 
-    fn handle(&mut self, msg: SelectOneMessage, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: Box<SelectOneMessage>, _: &mut Self::Context) -> Self::Result {
         let query = msg.0.clone();
         let params: Vec<Box<(dyn ToSql + Sync)>> = msg.1.into_iter().collect();
         let pool = self.0.clone();
