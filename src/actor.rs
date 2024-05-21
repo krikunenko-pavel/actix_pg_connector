@@ -7,7 +7,9 @@ use url::Url;
 
 use crate::messages::SelectOneMessage;
 
-pub struct PgConnector(Pool);
+pub struct PgConnector {
+    pool: Pool,
+}
 
 impl PgConnector {
     pub fn new(db_url: &str) -> Self {
@@ -22,9 +24,9 @@ impl PgConnector {
             recycling_method: RecyclingMethod::Fast,
         });
 
-        Self(
-            cfg.create_pool(Some(Runtime::Tokio1), NoTls).expect("Create pool error")
-        )
+        Self {
+            pool: cfg.create_pool(Some(Runtime::Tokio1), NoTls).expect("Create pool error")
+        }
     }
 }
 
@@ -38,7 +40,7 @@ impl Handler<SelectOneMessage> for PgConnector {
     fn handle(&mut self, msg: SelectOneMessage, _: &mut Self::Context) -> Self::Result {
         let query = msg.0.clone();
         let params: Vec<Box<(dyn ToSql + Sync)>> = msg.1.into_iter().collect();
-        let pool = self.0.clone();
+        let pool = self.pool.clone();
 
         Box::pin(async move {
             let inner_params: Vec<&(dyn ToSql + Sync)> = params.iter()
