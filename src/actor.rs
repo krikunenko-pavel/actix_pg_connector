@@ -1,11 +1,11 @@
 use actix;
 use actix::{Actor, Context, Handler, ResponseFuture};
 use deadpool_postgres::{Config, ManagerConfig, Pool, RecyclingMethod, Runtime};
-use deadpool_postgres::tokio_postgres::{NoTls, Row};
+use deadpool_postgres::tokio_postgres::NoTls;
 use deadpool_postgres::tokio_postgres::types::ToSql;
 use url::Url;
 
-use crate::messages::SelectOneMessage;
+use crate::messages::{ReturnOneResult, SelectOneMessage};
 
 pub struct PgConnector {
     pool: Pool,
@@ -35,11 +35,11 @@ impl Actor for PgConnector {
 }
 
 impl Handler<SelectOneMessage> for PgConnector {
-    type Result = ResponseFuture<Result<Row, deadpool_postgres::tokio_postgres::Error>>;
+    type Result = ResponseFuture<ReturnOneResult>;
 
     fn handle(&mut self, msg: SelectOneMessage, _: &mut Self::Context) -> Self::Result {
-        let query = msg.0.clone();
-        let params: Vec<Box<(dyn ToSql + Sync)>> = msg.1.into_iter().collect();
+        let query = msg.query.clone();
+        let params: Vec<Box<(dyn ToSql + Sync)>> = msg.values.into_iter().collect();
         let pool = self.pool.clone();
 
         Box::pin(async move {
