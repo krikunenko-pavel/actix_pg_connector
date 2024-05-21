@@ -32,10 +32,10 @@ impl Actor for PgConnector {
     type Context = Context<Self>;
 }
 
-impl Handler<SelectOneMessage<'static>> for PgConnector {
+impl Handler<SelectOneMessage> for PgConnector {
     type Result = ResponseFuture<Result<Row, deadpool_postgres::tokio_postgres::Error>>;
 
-    fn handle(&mut self, msg: SelectOneMessage<'static>, _: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: SelectOneMessage, _: &mut Self::Context) -> Self::Result {
         let query = msg.0.clone();
         let params: Vec<Box<(dyn ToSql + Sync)>> = msg.1.into_iter().collect();
         let pool = self.0.clone();
