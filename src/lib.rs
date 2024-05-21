@@ -1,5 +1,5 @@
-extern crate actix;
-extern crate deadpool_postgres;
+pub extern crate actix;
+pub extern crate deadpool_postgres;
 
 pub mod actor;
 pub mod messages;
