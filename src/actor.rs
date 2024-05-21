@@ -8,7 +8,7 @@ use url::Url;
 use crate::messages;
 use crate::messages::SelectOneMessage;
 
-struct PgConnector(Pool);
+pub struct PgConnector(Pool);
 
 impl PgConnector {
     pub fn new(db_url: &str) -> Self {
