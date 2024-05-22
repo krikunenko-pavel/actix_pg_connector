@@ -8,7 +8,7 @@ pub mod actor {
     use url::Url;
 
     pub struct PgConnector {
-        pool: Pool,
+        pub pool: Pool,
     }
 
     impl PgConnector {
